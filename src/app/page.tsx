@@ -4,13 +4,11 @@ export default function Home() {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center px-4 sm:px-8 pt-16 pb-24">
       {/* Header */}
-      <header className="text-center mb-12">
+      <header className="text-center mb-6">
         <h1 className="text-3xl sm:text-5xl font-extrabold text-white">
           Compound Effect vs. Inflation
         </h1>
-        <p className="text-lg sm:text-xl font-semibold text-slate-200 mt-2 whitespace-nowrap">
-          investing&nbsp;5,000&nbsp;DKK each month eroded by inflation over&nbsp;20&nbsp;years at different interest
-        </p>
+        {/* Subtitle removed as requested */}
       </header>
 
       {/* Chart Section */}

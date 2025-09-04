@@ -129,7 +129,7 @@ const CompoundChart = () => {
     labels: data.labels,
     datasets: [
       {
-        label: 'Inflation-Base-loser - (0% interest)',
+        label: 'Base (0% annual interest)',
         data: data.regularSavingsPower,
         borderColor: '#ef4444',
         backgroundColor: 'rgba(239, 68, 68, 0.3)',
@@ -138,7 +138,7 @@ const CompoundChart = () => {
         borderWidth: 3,
       },
       {
-        label: '7% Annual Return (Today\'s Purchasing Power)',
+        label: '7% (todays purchasing power)',
         data: data.investment7PercentPower,
         borderColor: '#eab308',
         backgroundColor: 'rgba(234, 179, 8, 0.5)',
@@ -146,15 +146,15 @@ const CompoundChart = () => {
         borderWidth: 2,
       },
       {
-        label: '20% Annual Return (Today\'s Purchasing Power)',
+        label: '20% (todays purchasing power)',
         data: data.investment20PercentPower,
-        borderColor: '#a855f7',
-        backgroundColor: 'rgba(168, 85, 247, 0.5)',
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.5)',
         tension: 0.1,
         borderWidth: 2,
       },
       {
-        label: '30% Annual Return (Today\'s Purchasing Power)',
+        label: '30% (todays purchasing power)',
         data: data.investment30PercentPower,
         borderColor: '#22c55e',
         backgroundColor: 'rgba(34, 197, 94, 0.5)',
@@ -169,28 +169,10 @@ const CompoundChart = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
-        labels: {
-          font: {
-            size: 14,
-            weight: 'bold',
-          },
-          usePointStyle: true,
-          padding: 20,
-        },
+        display: false, // Hide the built-in legend
       },
       title: {
-        display: true,
-        text: 'Compound Effect vs. Inflation: How 5,000 DKK/month Grows Over 20 Years',
-        font: {
-          size: 18,
-          weight: 'bold',
-        },
-        padding: {
-          top: 10,
-          bottom: 10,
-        },
-        color: 'white',
+        display: false, // Hide the built-in title
       },
       tooltip: {
         callbacks: {
@@ -215,22 +197,22 @@ const CompoundChart = () => {
             yMax: data.investment30PercentPower[YEARS],
             xMin: YEARS,
             xMax: YEARS,
-            borderColor: '#22c55e',         // bright green (30 % line colour)
+            borderColor: '#ffffff',         // white vertical line
             borderWidth: 3,
             borderDash: [10, 5],
             label: {
               display: true,
               content: `${formatDisparityDKK(disparityAmount)} difference in purchasing power`,
-              position: 'start',           // top of vertical line
+              position: 'end',             // top of vertical line (30% point)
               backgroundColor: '#1877f2',  // Facebook blue
-              color: '#ffd700',            // gold text
+              color: '#ffffff',            // white text
               font: {
                 size: 14,
                 weight: 'bold',
               },
               padding: 8,
-              xAdjust: -80,
-              yAdjust: -20,                // lift above point
+              xAdjust: -120,
+              yAdjust: 0,
             },
           },
           /* Short horizontal connector from label to vertical line */
@@ -238,7 +220,7 @@ const CompoundChart = () => {
             type: 'line',
             yMin: data.investment30PercentPower[YEARS],
             yMax: data.investment30PercentPower[YEARS],
-            xMin: YEARS - 2,               // small horizontal segment
+            xMin: YEARS - 2.5,
             xMax: YEARS,
             borderColor: '#ffffff',
             borderWidth: 2,
@@ -296,6 +278,7 @@ const CompoundChart = () => {
       <div className="bg-red-500/20 text-center py-2 px-4 rounded-lg mb-4 border border-red-500/30">
         <p className="text-red-300 font-bold text-lg">4% Annual Inflation Rate</p>
       </div>
+      
       {/* Information Description */}
       <div className="bg-slate-800/50 p-4 rounded-lg mb-6 border border-slate-700/50 text-slate-300 text-sm">
         <p>
@@ -306,7 +289,45 @@ const CompoundChart = () => {
         </p>
       </div>
       
-      {/* Chart */}
+      {/* Title and Legend Card */}
+      <div className="bg-slate-800/60 backdrop-blur-sm rounded-lg p-4 mb-5 border border-slate-700/50 shadow-md">
+        {/* Title */}
+        <h2 className="text-xl sm:text-2xl font-bold text-white text-center mb-4">
+          Compound Effect vs. Inflation: How 5,000 DKK/month Grows Over 20 Years
+        </h2>
+        
+        {/* Custom Legend (single-line) */}
+        <div className="flex flex-nowrap justify-center items-center gap-6 overflow-x-auto">
+          {/* Label on far left */}
+          <span className="font-bold text-white whitespace-nowrap mr-2">Annual Interest:</span>
+
+          {/* 0 % */}
+          <div className="flex items-center whitespace-nowrap">
+            <span className="inline-block w-4 h-4 rounded-full bg-red-500 mr-1"></span>
+            <span className="font-bold text-white">0%</span>
+          </div>
+
+          {/* 7 % */}
+          <div className="flex items-center whitespace-nowrap">
+            <span className="inline-block w-4 h-4 rounded-full bg-yellow-500 mr-1"></span>
+            <span className="font-bold text-white">7%</span>
+          </div>
+
+          {/* 20 % */}
+          <div className="flex items-center whitespace-nowrap">
+            <span className="inline-block w-4 h-4 rounded-full bg-blue-500 mr-1"></span>
+            <span className="font-bold text-white">20%</span>
+          </div>
+
+          {/* 30 % */}
+          <div className="flex items-center whitespace-nowrap">
+            <span className="inline-block w-4 h-4 rounded-full bg-green-500 mr-1"></span>
+            <span className="font-bold text-white">30%</span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Chart Card - Now contains only the pure chart */}
       <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 h-[600px] shadow-inner">
         <Line data={chartData} options={options} className="max-w-full" />
       </div>
@@ -314,43 +335,55 @@ const CompoundChart = () => {
       {/* Summary Cards */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 0% BASELINE */}
-        <div className="bg-red-500/20 p-4 rounded-lg border-2 border-black">
+        <div className="bg-red-500/20 p-4 rounded-lg border-2 border-black grid gap-y-1">
           <h3 className="font-bold text-red-400 text-lg">0% Annual Return</h3>
-          <p className="text-white/80 text-sm mt-2">20 year saving:</p>
-          <p className="text-white text-lg font-bold">{formatDKK(FINAL_VALUES.regularSavings.actual)}</p>
-          <p className="text-white/80 text-sm mt-2">Purchase power:</p>
-          <p className="text-white text-lg font-bold">{formatDKK(FINAL_VALUES.regularSavings.todaysPower)}</p>
-          <p className="text-white/80 text-sm mt-2">Lost to inflation:</p>
-          <p className="text-red-500 text-lg font-bold border border-black inline-block px-1">
-            {formatDKK(FINAL_VALUES.regularSavings.actual - FINAL_VALUES.regularSavings.todaysPower)}
-          </p>
+          <div className="flex justify-between text-white/80 text-sm">
+            <span>20 year saving:</span>
+            <span className="text-white font-bold">{formatDKK(FINAL_VALUES.regularSavings.actual)}</span>
+          </div>
+          <div className="flex justify-between text-white/80 text-sm">
+            <span>Todays Value:</span>
+            <span className="text-white font-bold">{formatDKK(FINAL_VALUES.regularSavings.todaysPower)}</span>
+          </div>
         </div>
         
         {/* 7% */}
-        <div className="bg-yellow-500/20 p-4 rounded-lg border border-yellow-500/30">
+        <div className="bg-yellow-500/20 p-4 rounded-lg border border-yellow-500/30 grid gap-y-1">
           <h3 className="font-bold text-yellow-400 text-lg">7% Annual Return</h3>
-          <p className="text-white/80 text-sm mt-2">20 year saving:</p>
-          <p className="text-white text-lg font-bold">{formatDKK(FINAL_VALUES.investment7Percent.actual)}</p>
-          <p className="text-white/80 text-sm mt-2">Purchase power:</p>
-          <p className="text-white text-lg font-bold">{formatDKK(FINAL_VALUES.investment7Percent.todaysPower)}</p>
+          <div className="flex justify-between text-white/80 text-sm">
+            <span>20 year saving:</span>
+            <span className="text-white font-bold">{formatDKK(FINAL_VALUES.investment7Percent.actual)}</span>
+          </div>
+          <div className="flex justify-between text-white/80 text-sm">
+            <span>Todays Value:</span>
+            <span className="text-white font-bold">{formatDKK(FINAL_VALUES.investment7Percent.todaysPower)}</span>
+          </div>
         </div>
         
         {/* 20% */}
-        <div className="bg-purple-500/20 p-4 rounded-lg border border-purple-500/30">
-          <h3 className="font-bold text-purple-400 text-lg">20% Annual Return</h3>
-          <p className="text-white/80 text-sm mt-2">20 year saving:</p>
-          <p className="text-white text-lg font-bold">{formatDKK(FINAL_VALUES.investment20Percent.actual)}</p>
-          <p className="text-white/80 text-sm mt-2">Purchase power:</p>
-          <p className="text-white text-lg font-bold">{formatDKK(FINAL_VALUES.investment20Percent.todaysPower)}</p>
+        <div className="bg-blue-500/20 p-4 rounded-lg border border-blue-500/30 grid gap-y-1">
+          <h3 className="font-bold text-blue-400 text-lg">20% Annual Return</h3>
+          <div className="flex justify-between text-white/80 text-sm">
+            <span>20 year saving:</span>
+            <span className="text-white font-bold">{formatDKK(FINAL_VALUES.investment20Percent.actual)}</span>
+          </div>
+          <div className="flex justify-between text-white/80 text-sm">
+            <span>Todays Value:</span>
+            <span className="text-white font-bold">{formatDKK(FINAL_VALUES.investment20Percent.todaysPower)}</span>
+          </div>
         </div>
         
         {/* 30% */}
-        <div className="bg-green-500/20 p-4 rounded-lg border border-green-500/30">
+        <div className="bg-green-500/20 p-4 rounded-lg border border-green-500/30 grid gap-y-1">
           <h3 className="font-bold text-green-400 text-lg">30% Annual Return</h3>
-          <p className="text-white/80 text-sm mt-2">20 year saving:</p>
-          <p className="text-white text-lg font-bold">{formatDKK(FINAL_VALUES.investment30Percent.actual)}</p>
-          <p className="text-white/80 text-sm mt-2">Purchase power:</p>
-          <p className="text-white text-lg font-bold">{formatDKK(FINAL_VALUES.investment30Percent.todaysPower)}</p>
+          <div className="flex justify-between text-white/80 text-sm">
+            <span>20 year saving:</span>
+            <span className="text-white font-bold">{formatDKK(FINAL_VALUES.investment30Percent.actual)}</span>
+          </div>
+          <div className="flex justify-between text-white/80 text-sm">
+            <span>Todays Value:</span>
+            <span className="text-white font-bold">{formatDKK(FINAL_VALUES.investment30Percent.todaysPower)}</span>
+          </div>
         </div>
       </div>
     </div>
