@@ -202,7 +202,7 @@ const CompoundChart = () => {
                 weight: 'bold',
               },
               padding: 8,
-              xAdjust: -120,
+              xAdjust: -8,
               yAdjust: 0,
             },
           },
