@@ -9,7 +9,7 @@ export default function Home() {
           Compound Effect vs. Inflation
         </h1>
         <p className="text-lg sm:text-xl font-semibold text-slate-200 mt-2 whitespace-nowrap">
-          How investing&nbsp;5,000&nbsp;DKK each month can outperform savings eroded by inflation over&nbsp;20&nbsp;years
+          investing&nbsp;5,000&nbsp;DKK each month eroded by inflation over&nbsp;20&nbsp;years at different interest
         </p>
       </header>
 

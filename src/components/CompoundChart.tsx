@@ -208,30 +208,43 @@ const CompoundChart = () => {
       },
       annotation: {
         annotations: {
+          /* Vertical disparity line at year 20 */
           disparityLine: {
             type: 'line',
             yMin: data.regularSavingsPower[YEARS],
             yMax: data.investment30PercentPower[YEARS],
             xMin: YEARS,
             xMax: YEARS,
-            borderColor: 'rgba(255, 255, 255, 0.7)', // light-gray / white
-            borderWidth: 2,
-            borderDash: [5, 5],
+            borderColor: '#22c55e',         // bright green (30 % line colour)
+            borderWidth: 3,
+            borderDash: [10, 5],
             label: {
               display: true,
               content: `${formatDisparityDKK(disparityAmount)} difference in purchasing power`,
-              position: 'center',
-              backgroundColor: 'rgba(0, 0, 0, 0.7)', // subtle black bg
-              color: '#ffffff', // white text
+              position: 'start',           // top of vertical line
+              backgroundColor: '#1877f2',  // Facebook blue
+              color: '#ffd700',            // gold text
               font: {
                 size: 14,
                 weight: 'bold',
               },
               padding: 8,
-              xAdjust: -120,
-            }
-          }
-        }
+              xAdjust: -80,
+              yAdjust: -20,                // lift above point
+            },
+          },
+          /* Short horizontal connector from label to vertical line */
+          horizontalConnector: {
+            type: 'line',
+            yMin: data.investment30PercentPower[YEARS],
+            yMax: data.investment30PercentPower[YEARS],
+            xMin: YEARS - 2,               // small horizontal segment
+            xMax: YEARS,
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            borderDash: [5, 5],
+          },
+        },
       }
     },
     scales: {
