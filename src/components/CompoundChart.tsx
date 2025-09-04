@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useLayoutEffect, useState } from 'react';
+import { useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -33,20 +33,6 @@ const CompoundChart = () => {
   
   // Chart reference for potential future interactions
   const chartRef = useRef(null);
-
-  // Overlay helpers ---------------------------------------------------------
-  const overlayRef = useRef<HTMLDivElement | null>(null);
-  const labelRef   = useRef<HTMLDivElement | null>(null);
-  const [overlay, setOverlay] = useState({
-    ready: false,
-    left: 0,
-    top: 0,
-    x1: 0,
-    y1: 0,
-    x2: 0,
-    y2: 0,
-  });
-
   
   // Exact yearly values as provided by user
   const yearlyValues = {
@@ -205,11 +191,31 @@ const CompoundChart = () => {
             borderColor: '#ffffff',         // white vertical line
             borderWidth: 3,
             borderDash: [10, 5],
-            // allow label to render outside chart area without clipping
-            clip: false,
             label: {
-              display: false, // handled by custom overlay
+              display: true,
+              content: `${formatDisparityDKK(disparityAmount)} difference in value`,
+              position: 'end',             // top of vertical line (30% point)
+              backgroundColor: '#1877f2',  // Facebook blue
+              color: '#ffffff',            // white text
+              font: {
+                size: 14,
+                weight: 'bold',
+              },
+              padding: 8,
+              xAdjust: -120,
+              yAdjust: 0,
             },
+          },
+          /* Short horizontal connector from label to vertical line */
+          horizontalConnector: {
+            type: 'line',
+            yMin: yearlyValues.thirtyPercent[YEARS],
+            yMax: yearlyValues.thirtyPercent[YEARS],
+            xMin: YEARS - 2.5,
+            xMax: YEARS,
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            borderDash: [5, 5],
           },
         },
       }
@@ -257,107 +263,8 @@ const CompoundChart = () => {
     },
   };
 
-  /* ---------------------------------------------------------------------- */
-  /* Compute overlay position whenever chart renders/resizes                */
-  /* ---------------------------------------------------------------------- */
-  useLayoutEffect(() => {
-    let frame = 0;
-    let disposed = false;
-
-    const update = () => {
-      const chart: any = chartRef.current;
-      const container = overlayRef.current;
-      if (!chart || !container) return;
-
-      const xScale = chart.scales?.x;
-      const yScale = chart.scales?.y;
-      const canvas: HTMLCanvasElement | null = chart.canvas;
-      const chartArea = chart.chartArea;
-      if (!xScale || !yScale || !canvas || !chartArea) return;
-
-      // Offsets to align canvas coordinates to overlay container coordinates
-      const containerRect = container.getBoundingClientRect();
-      const canvasRect = canvas.getBoundingClientRect();
-      const offsetLeft = canvasRect.left - containerRect.left;
-      const offsetTop = canvasRect.top - containerRect.top;
-
-      // Container size (used for clamping)
-      const containerW = container.clientWidth;
-      const containerH = container.clientHeight;
-
-      const x = xScale.getPixelForValue(YEARS) + offsetLeft;
-      const y = yScale.getPixelForValue(yearlyValues.thirtyPercent[YEARS]) + offsetTop;
-      /* ------------------------------------------------------------------ */
-      /* Plot boundaries in overlay-space coordinates                       */
-      /* ------------------------------------------------------------------ */
-      const xPlotLeft   = chartArea.left   + offsetLeft;
-      const xPlotRight  = chartArea.right  + offsetLeft;
-      const yPlotTop    = chartArea.top    + offsetTop;
-      const yPlotBottom = chartArea.bottom + offsetTop;
-
-      const lw = labelRef.current?.offsetWidth ?? 0;
-      const lh = labelRef.current?.offsetHeight ?? 0;
-
-      // If label hasn’t rendered its real size yet, wait one more frame
-      if (lw === 0 || lh === 0) {
-        frame = requestAnimationFrame(update);
-        return;
-      }
-
-      /* ------------------------------------------------------------------ */
-      /* Place label INSIDE plot, left of the point, with clamping          */
-      /* ------------------------------------------------------------------ */
-      const pad = 12;   // inner padding from plot edges
-      const gap = 10;   // space between card and point
-
-      let left = x - gap - lw;                              // left of point
-      left = Math.min(left, xPlotRight - lw - pad);         // not past right edge
-      left = Math.max(left, xPlotLeft + pad);               // not past left edge
-
-      let top = y - lh / 2;                                 // vertically centered
-      if (top < yPlotTop + pad) top = yPlotTop + pad;       // clamp top
-      if (top + lh > yPlotBottom - pad)
-        top = yPlotBottom - pad - lh;                       // clamp bottom
-
-      const x1 = left + lw;               // right edge of card
-      const y1 = top + lh / 2;            // middle of card
-      const x2 = x;                       // point position
-      const y2 = y;
-
-      setOverlay({ ready: true, left, top, x1, y1, x2, y2 });
-    };
-
-    const tickUntilReady = () => {
-      if (disposed) return;
-      if (!chartRef.current || !overlayRef.current) {
-        frame = requestAnimationFrame(tickUntilReady);
-        return;
-      }
-      // First update sets ready=true (label width may be 0)
-      update();
-      // Second frame re-measures label with real size
-      frame = requestAnimationFrame(update);
-    };
-
-    tickUntilReady();
-
-    const roContainer = new ResizeObserver(update);
-    if (overlayRef.current) roContainer.observe(overlayRef.current);
-    const roLabel = new ResizeObserver(update);
-    if (labelRef.current) roLabel.observe(labelRef.current);
-    window.addEventListener('resize', update);
-
-    return () => {
-      disposed = true;
-      cancelAnimationFrame(frame);
-      window.removeEventListener('resize', update);
-      roContainer.disconnect();
-      roLabel.disconnect();
-    };
-  }, []);
-
   return (
-    <div className="w-full h-full bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl shadow-2xl p-4">
+    <div className="w-full h-full bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl shadow-2xl p-6">
       {/* Title Card */}
       <div className="bg-slate-800/60 backdrop-blur-sm rounded-lg p-4 mb-5 border border-slate-700/50 shadow-md">
         <h2 className="text-xl sm:text-2xl font-bold text-white text-center mb-4">
@@ -429,41 +336,8 @@ const CompoundChart = () => {
       </div>
       
       {/* Chart Card - Now contains only the pure chart */}
-      <div className="relative bg-white/5 backdrop-blur-sm rounded-lg p-4 h-[480px] shadow-inner">
+      <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 h-[600px] shadow-inner">
         <Line data={chartData} options={options} className="max-w-full" ref={chartRef} />
-        <div
-          ref={overlayRef}
-          className="absolute inset-0 pointer-events-none z-10 hidden sm:block"
-        >
-          {overlay.ready && (
-            <svg className="absolute inset-0 w-full h-full">
-              <line
-                x1={overlay.x1}
-                y1={overlay.y1}
-                x2={overlay.x2}
-                y2={overlay.y2}
-                stroke="#ffffff"
-                strokeWidth={2}
-                strokeDasharray="5 5"
-              />
-            </svg>
-          )}
-
-          {/* Always render the label so width/height can be measured.
-              Invisible until overlay is positioned. */}
-          <div
-            ref={labelRef}
-            className={`absolute bg-[#1877f2] text-white font-bold text-sm rounded-md px-3 py-1.5 shadow pointer-events-auto whitespace-nowrap ${
-              overlay.ready ? '' : 'invisible'
-            }`}
-            style={{
-              left: overlay.ready ? overlay.left : 0,
-              top: overlay.ready ? overlay.top : 0,
-            }}
-          >
-            {`${formatDisparityDKK(disparityAmount)} difference in value`}
-          </div>
-        </div>
       </div>
     </div>
   );
